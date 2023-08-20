@@ -89,8 +89,6 @@ def get_user(user_id, question_id):
 
     insert_to_db(cursor, connection, user_id, question_id, row[0][5])
     facts = get_facts(cursor, user_id)
-    cursor.close()
-    connection.close()
 
     if key == 1:
         if row[0][2] == 0:
@@ -102,11 +100,16 @@ def get_user(user_id, question_id):
                 }
             })
         else:
+            cursor.execute(query, (row[0][2],))
+            row2 = cursor.fetchall()
+            cursor.close()
+            connection.close()
             return jsonify({
                 "is_done": 0,
                 "message": "go to another, yes",
                 "data": {
-                    "question_id": row[0][2]
+                    "question_id": row[0][2],
+                    "question": row2[0][1]
                 }
             })
     else:
@@ -119,11 +122,16 @@ def get_user(user_id, question_id):
                 }
             })
         else:
+            cursor.execute(query, (row[0][3],))
+            row2 = cursor.fetchall()
+            cursor.close()
+            connection.close()
             return jsonify({
                 "is_done": 0,
                 "message": "go to another, no",
                 "data": {
-                    "question_id": row[0][3]
+                    "question_id": row[0][3],
+                    "question": row2[0][1]
                 }
             })
 
@@ -132,6 +140,8 @@ def get_user(user_id, question_id):
         data.append({
             "id": row[0]
         })
+    cursor.close()
+    connection.close()
     return jsonify({"Try another one: ": [user_id, question_id, row[0][5]]})
 
 
